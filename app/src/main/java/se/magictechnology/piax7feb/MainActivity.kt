@@ -8,6 +8,8 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.viewModels
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 
 class MainActivity : AppCompatActivity() {
@@ -29,12 +31,16 @@ class MainActivity : AppCompatActivity() {
 
             var texten = findViewById<EditText>(R.id.mainEdittext).text.toString()
 
-            model.fruit = texten
-
-            findViewById<TextView>(R.id.mainTextview).text = model.fruit
+            model.currentName.value = texten
         }
 
+        val nameObserver = Observer<String> { newName ->
+            // Update the UI, in this case, a TextView.
+            findViewById<TextView>(R.id.mainTextview).text = newName
+        }
 
+        // Observe the LiveData, passing in this activity as the LifecycleOwner and the observer.
+        model.currentName.observe(this, nameObserver)
     }
 
     override fun onStart() {
@@ -59,4 +65,8 @@ class MainActivity : AppCompatActivity() {
 
 class FancyViewModel : ViewModel() {
     var fruit = ""
+
+    val currentName: MutableLiveData<String> by lazy {
+        MutableLiveData<String>()
+    }
 }
